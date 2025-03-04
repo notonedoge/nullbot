@@ -30,7 +30,7 @@ class Images(commands.Cog):
             img = await image.read()
 
             with Image.open(io.BytesIO(img)) as i:
-                ryder = Image.open(os.path.abspath('./data/ryder.png'))
+                ryder = Image.open(os.path.abspath('./data/rydert.png'))
                 w = i.height / ryder.height
                 x = int(round(ryder.width * w, 0))
                 size = (int(round(x * scale, 1)), int(round(i.height * scale, 1)))
