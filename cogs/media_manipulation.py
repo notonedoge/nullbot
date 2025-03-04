@@ -28,17 +28,16 @@ class Images(commands.Cog):
         await interaction.response.defer()
         try:
             img = await image.read()
-
             with Image.open(io.BytesIO(img)) as i:
-                ryder = Image.open(os.path.abspath('./data/rydert.png'))
-                w = i.height / ryder.height
-                x = int(round(ryder.width * w, 0))
-                size = (int(round(x * scale, 1)), int(round(i.height * scale, 1)))
-                resized_ryder = ryder.resize(size)
+                ryder = Image.open(os.path.abspath('./data/ryder.png'))
 
-                i.paste(ryder, (i.width-resized_ryder.width, i.height-resized_ryder.height))
-                i.convert('P')
-
+                scale_factor = i.height / ryder.height
+                new_width = int(round(ryder.width * scale_factor * scale, 0))
+                new_height = int(round(i.height * scale, 0))
+                resized_ryder = ryder.resize((new_width, new_height))
+                resized_ryder.convert("RGBA")
+                i.convert("RGBA")
+                i.paste(resized_ryder, (i.width-new_width, 0), resized_ryder)
                 if i.height > 1080:
                     ratio = 1080 / i.height
                     width = ratio * i.width
@@ -49,7 +48,6 @@ class Images(commands.Cog):
                 i.close()
                 file = discord.File(fp='i.png', filename='i.png')
                 embed = embeds.image(img='i.png', user=interaction.user.name, command='ryderize')
-                os.remove('i.png')
                 await interaction.followup.send(file=file, embed=embed)
         except:
             print(traceback.print_exc())
