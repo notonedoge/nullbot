@@ -57,9 +57,15 @@ class Images(commands.Cog):
     @commands.command(name='inspire', description='gets a quote using inspirobot')
     async def inspire(self, ctx):
         msg = await ctx.reply('waiting...', mention_author=False)
-        out = requests.get(url="https://inspirobot.me/api?generate=true").text
-        print(out)
-        await msg.edit(content=out)
+        try:
+            out = requests.get(url="https://inspirobot.me/api?generate=true")
+            print(out)
+            print(out.text)
+            link = out.text
+            await msg.edit(content=out)
+        except:
+            await msg.edit(content=f"```{traceback.format_exc()}```")
+
     @app_commands.command(name='inspire')
     async def inspirecmd(self,int):
         pass
