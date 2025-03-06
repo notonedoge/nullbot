@@ -60,7 +60,7 @@ class Images(commands.Cog):
         out = requests.get(url="https://inspirobot.me/api?generate=true").text
         print(out)
         await msg.edit(content=out)
-    @app_commands.command(name=inspire)
+    @app_commands.command(name='inspire')
     async def inspirecmd(self,int):
         pass
 async def setup(bot):
