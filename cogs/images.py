@@ -54,11 +54,14 @@ class Images(commands.Cog):
             err = traceback.format_exc()
             await interaction.followup.send(embed=embeds.error(err))
 
-    @commands.hybrid_command(name='inspire', description='gets a quote using inspirobot')
+    @commands.command(name='inspire', description='gets a quote using inspirobot')
     async def inspire(self, ctx):
         msg = await ctx.reply('waiting...', mention_author=False)
         out = requests.get(url="https://inspirobot.me/api?generate=true").text
         print(out)
         await msg.edit(content=out)
+    @app_commands.command(name=inspire)
+    async def inspirecmd(self,int):
+        pass
 async def setup(bot):
     await bot.add_cog(Images(bot))
