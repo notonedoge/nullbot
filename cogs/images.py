@@ -62,7 +62,7 @@ class Images(commands.Cog):
             print(out)
             print(out.text)
             link = out.text
-            await msg.edit(content=out)
+            await msg.edit(content=link)
         except:
             await msg.edit(content=f"```{traceback.format_exc()}```")
 

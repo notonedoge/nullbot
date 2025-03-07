@@ -7,7 +7,7 @@ no_permission_embed.set_footer(text='this attempt has been logged.')
 def image(img, time: int = None, command: str = None, user: str = None):
     embed = discord.Embed(title='', description='')
     embed.set_image(url=f'attachment://i.png')
-    embed.set_footer(text=f'{command, time, user}')
+    embed.set_footer(text=f'{command} | {time} | {user}')
     return embed
 
 
