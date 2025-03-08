@@ -54,36 +54,36 @@ class Images(commands.Cog):
             err = traceback.format_exc()
             await interaction.followup.send(embed=embeds.error(err))
 
-    @app_commands.context_menu(name='ryderize')
-    async def ryderize(self, interaction, image: discord.Attachment, scale: float = 1.0):
-        await interaction.response.defer()
-        try:
-            img = await image.read()
-            with Image.open(io.BytesIO(img)) as i:
-                ryder = Image.open(os.path.abspath('./data/ryder.png'))
+  # @app_commands.context_menu(name='ryderize')
+  # async def ryderize(self, interaction, image: discord.Attachment, scale: float = 1.0):
+  #     await interaction.response.defer()
+  #     try:
+  #         img = await image.read()
+  #         with Image.open(io.BytesIO(img)) as i:
+  #             ryder = Image.open(os.path.abspath('./data/ryder.png'))
 
-                scale_factor = i.height / ryder.height
-                new_width = int(round(ryder.width * scale_factor * scale, 0))
-                new_height = int(round(i.height * scale, 0))
-                resized_ryder = ryder.resize((new_width, new_height))
-                resized_ryder.convert("RGBA")
-                i.convert("RGBA")
-                i.paste(resized_ryder, (i.width - new_width, 0), resized_ryder)
-                if i.height > 1080:
-                    ratio = 1080 / i.height
-                    width = ratio * i.width
-                    final = i.resize((1080, int(width)))
-                else:
-                    final = i
-                final.save('i.png')
-                i.close()
-                file = discord.File(fp='i.png', filename='i.png')
-                embed = embeds.image(img='i.png', user=interaction.user.name, command='ryderize')
-                await interaction.followup.send(file=file, embed=embed)
-        except:
-            print(traceback.print_exc())
-            err = traceback.format_exc()
-            await interaction.followup.send(embed=embeds.error(err))
+  #             scale_factor = i.height / ryder.height
+  #             new_width = int(round(ryder.width * scale_factor * scale, 0))
+  #             new_height = int(round(i.height * scale, 0))
+  #             resized_ryder = ryder.resize((new_width, new_height))
+  #             resized_ryder.convert("RGBA")
+  #             i.convert("RGBA")
+  #             i.paste(resized_ryder, (i.width - new_width, 0), resized_ryder)
+  #             if i.height > 1080:
+  #                 ratio = 1080 / i.height
+  #                 width = ratio * i.width
+  #                 final = i.resize((1080, int(width)))
+  #             else:
+  #                 final = i
+  #             final.save('i.png')
+  #             i.close()
+  #             file = discord.File(fp='i.png', filename='i.png')
+  #             embed = embeds.image(img='i.png', user=interaction.user.name, command='ryderize')
+  #             await interaction.followup.send(file=file, embed=embed)
+  #     except:
+  #         print(traceback.print_exc())
+  #         err = traceback.format_exc()
+  #         await interaction.followup.send(embed=embeds.error(err))
 
     @commands.command(name='inspire', description='gets a quote using inspirobot')
     async def inspire(self, ctx):
