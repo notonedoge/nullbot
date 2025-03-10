@@ -18,6 +18,7 @@ class Media(commands.Cog):
             r"music\.apple\.com\/[a-zA-Z]{2}\/album\/[a-zA-Z\d%\(\)-]+\/[\d]{1,10}|"
             r"spotify\.link\/[A-Za-z0-9]+|"
             r"music\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}"
+            r"youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}"
         )
         self.suppress_embed_pattern = re.compile(
             r"https:\/\/(open\.spotify\.com\/track\/[A-Za-z0-9]+|"
@@ -29,6 +30,8 @@ class Media(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if match := self.pattern.search(message.content.strip("<>")):
+            embed = discord.Embed(title=f"Getting song info...", description=f'')
+            msg = await message.reply(embed=embed, mention_author=False)
             link = match.group(0)
             song = requests.get(f"https://api.song.link/v1-alpha.1/links?url={link}")
             info = song.json()
@@ -38,6 +41,11 @@ class Media(commands.Cog):
             author = info["entitiesByUniqueId"][songid]["artistName"]
             thumbnail = info["entitiesByUniqueId"][songid]["thumbnailUrl"]
             link_type = info["entitiesByUniqueId"][songid]["type"]
+
+            if "youtube" in info["linksByPlatform"]:
+                if "spotify" not in info["linksByPlatform"] or "appleMusic" not in info["linksByPlatform"]:
+                    await msg.delete()
+                    return
 
             view = discord.ui.View()
             if "youtubeMusic" in info["linksByPlatform"]:
@@ -68,7 +76,7 @@ class Media(commands.Cog):
 
             if "YOUTUBE_VIDEO" not in info["entityUniqueId"] and "SPOTIFY_SONG" not in info["entityUniqueId"]:
                 await message.edit(suppress=True)
-            await message.reply(embed=embed, view=view, mention_author=False)
+            await msg.edit(embed=embed, view=view)
 
 
 async def setup(bot):
