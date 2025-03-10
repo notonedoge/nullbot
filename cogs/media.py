@@ -7,22 +7,22 @@ import os
 import requests
 import re
 
+song_cache = {}
 
 class Media(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.pattern = re.compile(
-            r"https:\/\/open\.spotify\.com\/track\/[A-Za-z0-9]+|"
-            r"https:\/\/open\.spotify\.com\/album\/[A-Za-z0-9]+|"
-            r"music\.apple\.com\/[a-zA-Z]{2}\/album\/[a-zA-Z\d%\(\)-]+\/[\d]{1,10}\?i=[\d]{1,15}|"
-            r"music\.apple\.com\/[a-zA-Z]{2}\/album\/[a-zA-Z\d%\(\)-]+\/[\d]{1,10}|"
+            r"https:\/\/(open\.spotify\.com\/track\/[A-Za-z0-9]+|"
+            r"(http://|https://)?(?:geo\.)?music\.apple\.com\/[a-zA-Z]{2}\/(?:album|song)\/[^\/]+\/\d+(?:\?[^\s]*)?|"
             r"spotify\.link\/[A-Za-z0-9]+|"
-            r"music\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}"
-            r"youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}"
+            r"youtu\.be\/[A-Za-z0-9_-]{11}|"
+            r"(?:www\.|m\.)?youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}|"
+            r"music\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11})"
         )
         self.suppress_embed_pattern = re.compile(
             r"https:\/\/(open\.spotify\.com\/track\/[A-Za-z0-9]+|"
-            r"music\.apple\.com\/[a-zA-Z]{2}\/album\/[a-zA-Z\d%\(\)-]+\/[\d]{1,10}\?i=[\d]{1,15}|"
+            r"(http://|https://)?(?:geo\.)?music\.apple\.com\/[a-zA-Z]{2}\/(?:album|song)\/[^\/]+\/\d+(?:\?[^\s]*)?|"
             r"music\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11})"
         )
 
@@ -33,7 +33,11 @@ class Media(commands.Cog):
             embed = discord.Embed(title=f"Getting song info...", description=f'')
             msg = await message.reply(embed=embed, mention_author=False)
             link = match.group(0)
-            song = requests.get(f"https://api.song.link/v1-alpha.1/links?url={link}")
+            if link in song_cache:
+                song = song_cache[link]
+            else:
+                song = requests.get(f"https://api.song.link/v1-alpha.1/links?url={link}")
+                song_cache[link] = song
             info = song.json()
 
             songid = info["entityUniqueId"]
@@ -44,7 +48,8 @@ class Media(commands.Cog):
 
             if "youtube" in info["linksByPlatform"]:
                 if "spotify" not in info["linksByPlatform"] or "appleMusic" not in info["linksByPlatform"]:
-                    await msg.delete()
+                    embed = discord.Embed(title=f"Not a song.", description=f'', color=discord.Color.red())
+                    await msg.edit(embed=embed, delete_after=1)
                     return
 
             view = discord.ui.View()
@@ -77,6 +82,11 @@ class Media(commands.Cog):
             if "YOUTUBE_VIDEO" not in info["entityUniqueId"] and "SPOTIFY_SONG" not in info["entityUniqueId"]:
                 await message.edit(suppress=True)
             await msg.edit(embed=embed, view=view)
+
+    @commands.command(hidden=True)
+    async def clear_songs(self, ctx):
+        song_cache.clear()
+        await ctx.reply("Cache cleared.")
 
 
 async def setup(bot):
