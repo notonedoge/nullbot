@@ -41,10 +41,10 @@ class Owner(commands.Cog):
     async def reload_cog(self, ctx, extension: str):
         extension = extension.lower()
         try:
-            await ctx.message.add_reaction("<a:load:1332186697823162489>")
-            await self.bot.reload_extension(f'cogs.{extension}')
-            await ctx.message.remove_reaction("<a:load:1332186697823162489>", self.bot.user)
-            await ctx.message.add_reaction("✅")
+            #await ctx.message.add_reaction("<a:load:1332186697823162489>")
+            #await self.bot.reload_extension(f'cogs.{extension}')
+            #await ctx.message.remove_reaction("<a:load:1332186697823162489>", self.bot.user)
+            #await ctx.message.add_reaction("✅")
             fmt = await ctx.bot.tree.sync(guild=ctx.guild)
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
