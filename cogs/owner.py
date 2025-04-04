@@ -103,6 +103,7 @@ class Owner(commands.Cog):
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
 
     @commands.command(hidden=True)
+    @commands.guild_only()
     @commands.has_guild_permissions(manage_messages=True)
     async def purge(self, ctx, count: int):
         if count > 100:
