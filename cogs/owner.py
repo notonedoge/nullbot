@@ -7,6 +7,11 @@ import os
 import subprocess
 import embeds
 import glob
+import yaml
+
+
+with open("data.yml", "r") as file:
+    data = yaml.safe_load(file)
 
 
 class Owner(commands.Cog):
@@ -97,6 +102,24 @@ class Owner(commands.Cog):
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
 
+    @commands.command(hidden=True)
+    @commands.has_guild_permissions(manage_messages=True)
+    async def purge(self, ctx, count: int):
+        if count > 100:
+            await ctx.send('value too large. (max 100)')
+        elif count < 1:
+            for number in range(1, count):
+                await ctx.send('message')
+        else:
+            await ctx.channel.purge(limit=count + 1)
+            channel_id = data[ctx.guild.id]["message_log"]
+            channel = self.bot.get_channel(channel_id)
+            s = "s"
+            if count == 1:
+                s = ""
+            embed = discord.Embed(title=f'{count} Message{s} Purged')
+            embed.add_field(name=f'Sent by', value={ctx.author.user.name})
+            await channel.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Owner(bot))
