@@ -46,7 +46,8 @@ class Media(commands.Cog):
             thumbnail = info["entitiesByUniqueId"][songid]["thumbnailUrl"]
             link_type = info["entitiesByUniqueId"][songid]["type"]
 
-            if "youtube" in match.group(0):
+            print(match.group(0))
+            if "youtube" in match.group(0) or "youtu.be" in match.group(0):
                 if not 'spotify' in info.get('linksByPlatform', {}):
                     embed = discord.Embed(title=f"Not a song.", description=f'', color=discord.Color.red())
                     await msg.edit(embed=embed, delete_after=1)
