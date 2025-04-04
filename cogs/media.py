@@ -48,7 +48,7 @@ class Media(commands.Cog):
 
             print(match.group(0))
             if "youtube" in match.group(0) or "youtu.be" in match.group(0):
-                if not 'spotify' in info.get('linksByPlatform', {}):
+                if 'spotify' not in info.get('linksByPlatform', {}):
                     embed = discord.Embed(title=f"Not a song.", description=f'', color=discord.Color.red())
                     await msg.edit(embed=embed, delete_after=1)
                     return
