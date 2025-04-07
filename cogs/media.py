@@ -48,7 +48,6 @@ class Media(commands.Cog):
                 thumbnail = info["entitiesByUniqueId"][songid]["thumbnailUrl"]
                 link_type = info["entitiesByUniqueId"][songid]["type"]
 
-                print(match.group(0))
                 if "youtube" in match.group(0) or "youtu.be" in match.group(0):
                     if 'spotify' not in info.get('linksByPlatform', {}):
                         embed = discord.Embed(title=f"Not a song.", description=f'', color=discord.Color.red())
