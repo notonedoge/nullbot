@@ -90,8 +90,6 @@ class Images(commands.Cog):
         msg = await ctx.reply('waiting...', mention_author=False)
         try:
             out = requests.get(url="https://inspirobot.me/api?generate=true")
-            print(out)
-            print(out.text)
             link = out.text
             await msg.edit(content=link)
         except:
