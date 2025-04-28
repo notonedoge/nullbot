@@ -3,20 +3,16 @@ from discord import app_commands
 from discord.ext import commands
 import os
 import platform
-import subprocess
-import sys
 
-
-
-class Ping(commands.Cog):
+class Moderator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.hybrid_command(name='ping')
-    async def ping(self, ctx):
+    @commands.hybrid_command(name='kick')
+    async def kick(self, ctx):
         try:
             embed = discord.Embed(
-                title=f"Pong!", description=f"", color=0x194D33
+                title=f"{self.bot.user.name}", description=f"", color=0x194D33
             )
 
             embed.add_field(name=f'discord.py version', value=discord.__version__)
@@ -30,10 +26,10 @@ class Ping(commands.Cog):
             embed.add_field(name=f'Platform', value=platform.system())
             embed.add_field(name=f'{len(self.bot.cogs)} cogs loaded', value='')
             embed.set_thumbnail(url=self.bot.user.avatar.url)
-            await ctx.reply(embed=embed)
+            await ctx.channel.send(embed=embed)
         except Exception as e:
             await ctx.reply(e)
 
 
 async def setup(bot):
-    await bot.add_cog(Ping(bot))
+    await bot.add_cog(Moderator(bot))
