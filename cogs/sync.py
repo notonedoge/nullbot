@@ -9,7 +9,7 @@ class Sync(commands.Cog):
         self.bot = bot
 
     @commands.command(hidden=True)
-    async def csync(self, ctx):
+    async def sync(self, ctx):
         try:
             fmt = await self.bot.tree.sync()
             embed = discord.Embed(title='done.', description=f'synced {len(fmt)} commands')

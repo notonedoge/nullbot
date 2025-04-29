@@ -23,6 +23,8 @@ class Images(commands.Cog):
         global ryderize_running
         ryderize_running = False
 
+
+
     @app_commands.command(name='ryderize', description='adds a photo of ryder/ pointing to an image')
     async def ryderize(self, interaction, image: discord.Attachment, scale: float = 1.0):
         await interaction.response.defer()
