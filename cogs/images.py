@@ -61,7 +61,7 @@ class Images(commands.Cog):
             err = traceback.format_exc()
             await interaction.followup.send(embed=embeds.error(err))
 
-    @commands.command(name='inspire', description='gets a quote using inspirobot')
+    @commands.command(name='inspire', description='be inspired')
     async def inspire(self, ctx):
         msg = await ctx.reply('waiting...', mention_author=False)
         try:

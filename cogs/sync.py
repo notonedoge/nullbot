@@ -30,7 +30,7 @@ class Sync(commands.Cog):
             # Create an embed to display the commands
             embed = discord.Embed(title="Registered Commands", color=discord.Color.blue())
             for cmd in commands:
-                embed.add_field(name=cmd['name'], description=cmd.get('description', 'No description'),
+                embed.add_field(name=cmd['name'],
                                 value=f"ID: {cmd['id']}", inline=False)
 
             await ctx.reply(embed=embed)
