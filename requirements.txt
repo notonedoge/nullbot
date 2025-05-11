@@ -3,4 +3,4 @@ colorama
 dotenv
 requests
 yaml
-pillow
+PyYAML
