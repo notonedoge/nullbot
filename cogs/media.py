@@ -32,8 +32,7 @@ class Media(commands.Cog):
     async def on_message(self, message: discord.Message):
         try:
             if match := self.pattern.search(message.content.strip("<>")):
-                embed = discord.Embed(title=f"Getting song info...", description=f'')
-                msg = await message.reply(embed=embed, mention_author=False)
+                await message.add_reaction("⏳")
                 link = match.group(0)
                 if link in song_cache:
                     song = song_cache[link]
@@ -50,8 +49,7 @@ class Media(commands.Cog):
 
                 if "youtube" in match.group(0) or "youtu.be" in match.group(0):
                     if 'spotify' not in info.get('linksByPlatform', {}):
-                        embed = discord.Embed(title=f"Not a song.", description=f'', color=discord.Color.red())
-                        await msg.edit(embed=embed, delete_after=1)
+                        await message.clear_reactions()
                         return
 
                 view = discord.ui.View()
@@ -83,7 +81,9 @@ class Media(commands.Cog):
 
                 if "YOUTUBE_VIDEO" not in info["entityUniqueId"] and "SPOTIFY_SONG" not in info["entityUniqueId"]:
                     await message.edit(suppress=True)
-                await msg.edit(embed=embed, view=view)
+                await message.reply(embed=embed, view=view, mention_author=False)
+                await message.clear_reaction("⏳")
+
         except:
             log = traceback.format_exc()
             await message.reply(f"```{log}```")
