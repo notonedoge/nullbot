@@ -17,7 +17,7 @@ class Logging(commands.Cog):
     async def on_message_edit(self, before, after):
         channel_id = data[before.guild.id]["message_log"]
         channel = self.bot.get_channel(channel_id)
-        if after.author.id != self.bot.user.id:
+        if after.author.id != self.bot.user.id and after.author.id != 1211781489931452447:
             if before.content != after.content:
                 embed = discord.Embed(title="Message Edited", description=f"Channel: {after.channel}", color=0xD8E941)
                 embed.set_author(name=before.author.name, icon_url=after.author.avatar.url if after.author.avatar else after.author.default_avatar.url)
@@ -33,7 +33,7 @@ class Logging(commands.Cog):
 
         mchannel_name = str(message.channel.name)
 
-        if message.author.id != self.bot.user.id:
+        if message.author.id != self.bot.user.id and message.author.id != 1211781489931452447:
             if message.attachments:
                 urls = [attachment.url for attachment in message.attachments]
                 embed = discord.Embed(title="Message Deleted", description=f"{message.content} & images", color=0xB80000)
