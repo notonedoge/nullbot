@@ -4,3 +4,4 @@ dotenv
 requests
 PyYAML
 pillow
+python-dotenv
