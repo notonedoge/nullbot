@@ -44,9 +44,9 @@ async def load():
                 traceback.print_exc()
 
 
-async def start():
+async def main():
     await load()
     await bot.start(os.getenv("TOKEN"), reconnect=True)
 
 
-asyncio.run(start())
+asyncio.run(main())
