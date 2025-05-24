@@ -5,6 +5,7 @@ import asyncio
 import os
 from colorama import Fore
 from dotenv import load_dotenv
+import subprocess
 
 load_dotenv()
 
@@ -20,6 +21,17 @@ async def on_ready():
     print(Fore.RESET)
     bot.startup_time = discord.utils.utcnow()
 
+@commands.is_owner()
+@commands.command()
+async def restart(ctx):
+    await bot.close()
+    asyncio.run(start())
+
+@commands.is_owner()
+@commands.command()
+async def pull(ctx):
+    await ctx.reply(os.getcwd())
+    subprocess.run("git pull", shell=True)
 
 async def load():
     for file in os.listdir('./cogs'):
@@ -32,9 +44,9 @@ async def load():
                 traceback.print_exc()
 
 
-async def main():
+async def start():
     await load()
     await bot.start(os.getenv("TOKEN"), reconnect=True)
 
 
-asyncio.run(main())
+asyncio.run(start())
