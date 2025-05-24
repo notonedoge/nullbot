@@ -6,7 +6,6 @@ import platform
 import subprocess
 import sys
 import asyncio
-import main
 
 class Ping(commands.Cog):
     def __init__(self, bot):
