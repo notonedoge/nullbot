@@ -97,8 +97,7 @@ class Owner(commands.Cog):
     async def restart(self, ctx):
         msg = await ctx.send('now restarting')
         try:
-            os.chdir('/home/ubuntu/nullbot')
-            subprocess.run("sudo ./restart.sh", shell=True)
+            subprocess.run("sudo ./home/ubuntu/nullbot/restart.sh", shell=True)
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
 
