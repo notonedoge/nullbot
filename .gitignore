@@ -3,4 +3,4 @@
 /.idea/
 __pycache__
 i.png
-cogs/ai.py
+disabled/ollama.py
