@@ -24,14 +24,7 @@ async def on_ready():
 @commands.is_owner()
 @commands.command()
 async def restart(ctx):
-    await bot.close()
-    asyncio.run(start())
-
-@commands.is_owner()
-@commands.command()
-async def pull(ctx):
-    await ctx.reply(os.getcwd())
-    subprocess.run("git pull", shell=True)
+    subprocess.run(f".{os.getcwd()}/restart.sh", shell=True)
 
 async def load():
     for file in os.listdir('./cogs'):
