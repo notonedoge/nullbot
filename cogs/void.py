@@ -109,6 +109,8 @@ class AI(commands.Cog):
 
     @commands.command()
     async def image(self, ctx):
+        content = str(ctx.message.content)
+        content = content.removeprefix(".image ").strip()
         await ctx.message.add_reaction("⏳")
         prompt = ctx.message.content
         result = client.images.generate(
