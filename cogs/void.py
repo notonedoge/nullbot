@@ -107,7 +107,19 @@ class AI(commands.Cog):
                     await ctx.send(chunk)
 
 
+    @commands.command()
+    async def image(self, ctx):
+        prompt = ctx.message.content
+        result = client.images.generate(
+            model="gpt-image-1",
+            prompt=prompt,
+            size="1024x1024",
+            quality="standard",
+            n=1,
+        )
 
+        image_url = result.data[0].url
+        await ctx.reply(image_url)
 
 async def setup(bot):
     await bot.add_cog(AI(bot))
