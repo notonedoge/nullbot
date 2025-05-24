@@ -21,10 +21,6 @@ async def on_ready():
     print(Fore.RESET)
     bot.startup_time = discord.utils.utcnow()
 
-@commands.is_owner()
-@commands.command()
-async def restart(ctx):
-    subprocess.run(f".{os.getcwd()}/restart.sh", shell=True)
 
 async def load():
     for file in os.listdir('./cogs'):
