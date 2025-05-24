@@ -109,6 +109,7 @@ class AI(commands.Cog):
 
     @commands.command()
     async def image(self, ctx):
+        await ctx.message.add_reaction("⏳")
         prompt = ctx.message.content
         result = client.images.generate(
             model="gpt-image-1",
@@ -119,6 +120,7 @@ class AI(commands.Cog):
         )
 
         image_url = result.data[0].url
+        await ctx.message.clear_reactions()
         await ctx.reply(image_url)
 
 async def setup(bot):
