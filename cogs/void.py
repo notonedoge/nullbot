@@ -113,15 +113,14 @@ class AI(commands.Cog):
             content = str(ctx.message.content)
             content = content.removeprefix(".image ").strip()
             await ctx.message.add_reaction("⏳")
-            prompt = ctx.message.content
             result = client.images.generate(
                 model="gpt-image-1",
-                prompt=prompt,
+                prompt=content,
                 size="1024x1024",
                 quality="auto",
                 n=1,
             )
-
+            print(result)
             image_url = result.data[0].url
             await ctx.message.clear_reactions()
             await ctx.reply(image_url)
