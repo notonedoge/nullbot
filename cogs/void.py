@@ -6,6 +6,7 @@ import io
 from collections import defaultdict
 import re
 from openai import OpenAI
+import base64
 from dotenv import load_dotenv
 import os
 
@@ -120,7 +121,7 @@ class AI(commands.Cog):
                 quality="auto",
                 n=1,
             )
-            print(result)
+            print(result.data)
             image_url = result.data[0].url
             await ctx.message.clear_reactions()
             await ctx.reply(image_url)
