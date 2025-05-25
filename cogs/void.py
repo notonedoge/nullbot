@@ -109,21 +109,24 @@ class AI(commands.Cog):
 
     @commands.command()
     async def image(self, ctx):
-        content = str(ctx.message.content)
-        content = content.removeprefix(".image ").strip()
-        await ctx.message.add_reaction("⏳")
-        prompt = ctx.message.content
-        result = client.images.generate(
-            model="gpt-image-1",
-            prompt=prompt,
-            size="1024x1024",
-            quality="standard",
-            n=1,
-        )
+        try:
+            content = str(ctx.message.content)
+            content = content.removeprefix(".image ").strip()
+            await ctx.message.add_reaction("⏳")
+            prompt = ctx.message.content
+            result = client.images.generate(
+                model="gpt-image-1",
+                prompt=prompt,
+                size="1024x1024",
+                quality="standard",
+                n=1,
+            )
 
-        image_url = result.data[0].url
-        await ctx.message.clear_reactions()
-        await ctx.reply(image_url)
+            image_url = result.data[0].url
+            await ctx.message.clear_reactions()
+            await ctx.reply(image_url)
+        except:
+            await ctx.reply(traceback.format_exc())
 
 async def setup(bot):
     await bot.add_cog(AI(bot))
