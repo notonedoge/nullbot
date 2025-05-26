@@ -81,31 +81,31 @@ class AI(commands.Cog):
 
         await ctx.message.add_reaction("⏳")
         messages = [{"role": "user", "content": content}]
-        response = client.chat.completions.create(
-            model="gemini-2.5-flash-preview-05-20",  # An Anthropic model
-            messages=messages
-        )
+        # response = client.chat.completions.create(
+        #    model="gemini-2.5-flash-preview-05-20",  # An Anthropic model
+        #    messages=messages
+        #)
 
         # Extract and print the response
-        full_response = response.choices[0].message.content
+        #full_response = response.choices[0].message.content
 
         await ctx.message.clear_reactions()
 
         # Split response into chunks if it exceeds Discord's character limit
-        if full_response.startswith("<think>"):
-            full_response = re.sub(r'<think>.*?</think>', '', full_response, flags=re.DOTALL)
-            full_response = full_response.strip()
+       #if full_response.startswith("<think>"):
+       #    full_response = re.sub(r'<think>.*?</think>', '', full_response, flags=re.DOTALL)
+       #    full_response = full_response.strip()
         if True:
             await ctx.reply('# THE GRAINS OF SAND ARE FALLING')
-        else:
-            chunks = self.split_into_chunks(full_response, 1990)
-            first_chunk = True
-            for chunk in chunks:
-                if first_chunk:
-                    await ctx.reply(chunk)
-                    first_chunk = False
-                else:
-                    await ctx.send(chunk)
+        #else:
+        #    chunks = self.split_into_chunks(full_response, 1990)
+        #    first_chunk = True
+        #    for chunk in chunks:
+        #        if first_chunk:
+        #            await ctx.reply(chunk)
+        #            first_chunk = False
+        #        else:
+        #            await ctx.send(chunk)
 
 
     @commands.command()
