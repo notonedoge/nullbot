@@ -96,7 +96,7 @@ class AI(commands.Cog):
             full_response = re.sub(r'<think>.*?</think>', '', full_response, flags=re.DOTALL)
             full_response = full_response.strip()
         if len(full_response) <= 2000:
-            await ctx.reply(full_response)
+            await ctx.reply('# THE GRAINS OF SAND ARE FALLING')
         else:
             chunks = self.split_into_chunks(full_response, 1990)
             first_chunk = True
