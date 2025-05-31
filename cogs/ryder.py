@@ -37,7 +37,7 @@ class Ryder(commands.Cog):
                     return
         else:
             # No emojis found, so we check the content
-            if message.content.lower() != 'ryder':
+            if not 'ryder' in message.content.lower():
                 await message.delete()
                 return
 
