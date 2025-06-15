@@ -1,3 +1,5 @@
+import traceback
+
 import discord
 from discord.ext import commands
 import re
@@ -40,6 +42,16 @@ class Ryder(commands.Cog):
             if not 'ryder' in message.content.lower():
                 await message.delete()
                 return
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        try:
+            if str(after.nick).startswith("MEGA"): return
+            if before.nick != after.nick:
+                nickname=str(f"MEGA "+ after.nick).upper()
+                await before.edit(nick=nickname)
+        except Exception as e:
+            print(traceback.format_exc())
 
 async def setup(bot):
     await bot.add_cog(Ryder(bot))
