@@ -104,6 +104,7 @@ class Media(commands.Cog):
           if match := re.search(r"/https:\/\/x\.com\/([a-zA-Z0-9_]+\/status\/\d+)", message.content):
               id = match.group(1)
               await message.reply(f"[twitter](https://fixupx.com/{id})")
+              await message.edit(suppress=True)
         except:
             log = traceback.format_exc()
             await message.reply(f"```{log}```")
