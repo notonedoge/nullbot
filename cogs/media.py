@@ -21,6 +21,14 @@ class Media(commands.Cog):
             r"(?:www\.|m\.)?youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}|"
             r"music\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11})"
         )
+        self.socials = re.compile(
+            r"https:\/\/x\.com\/[a-zA-Z0-9_]+\/status\/(\d+)"
+            r"(http://|https://)?(?:geo\.)?music\.apple\.com\/[a-zA-Z]{2}\/(?:album|song)\/[^\/]+\/\d+(?:\?[^\s]*)?|"
+            r"spotify\.link\/[A-Za-z0-9]+|"
+            r"youtu\.be\/[A-Za-z0-9_-]{11}|"
+            r"(?:www\.|m\.)?youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}|"
+            r"music\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11})"
+        )
         self.suppress_embed_pattern = re.compile(
             r"https:\/\/(open\.spotify\.com\/track\/[A-Za-z0-9]+|"
             r"(http://|https://)?(?:geo\.)?music\.apple\.com\/[a-zA-Z]{2}\/(?:album|song)\/[^\/]+\/\d+(?:\?[^\s]*)?|"
@@ -84,6 +92,18 @@ class Media(commands.Cog):
                 await message.reply(embed=embed, view=view, mention_author=False)
                 await message.clear_reaction("⏳")
 
+        except:
+            log = traceback.format_exc()
+            await message.reply(f"```{log}```")
+
+
+    #  tiktok twitter etc
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        try:
+          if match := re.search(r"/https:\/\/x\.com\/([a-zA-Z0-9_]+\/status\/\d+)", message.content):
+              id = match.group(1)
+              await message.reply(f"[twitter](https://fixupx.com/{id})")
         except:
             log = traceback.format_exc()
             await message.reply(f"```{log}```")
