@@ -12,7 +12,7 @@ load_dotenv()
 
 intents = discord.Intents.all()
 mentions = discord.AllowedMentions(everyone=False, users=True, roles=False)
-bot = commands.Bot(command_prefix='.', intents=intents, application_id=1345951741144989766)
+bot = commands.Bot(command_prefix=',', intents=intents, application_id=1345951741144989766)
 
 
 @bot.event
