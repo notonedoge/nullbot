@@ -90,18 +90,6 @@ class Media(commands.Cog):
             await message.reply(f"```{log}```")
 
 
-    #  tiktok twitter etc
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        try:
-          if match := re.search(r"/https:\/\/x\.com\/([a-zA-Z0-9_]+\/status\/\d+)", message.content):
-              id = match.group(1)
-              await message.reply(f"[twitter](https://fixupx.com/{id})")
-              await message.edit(suppress=True)
-        except:
-            log = traceback.format_exc()
-            await message.reply(f"```{log}```")
-
     @commands.command(hidden=True)
     async def clear_songs(self, ctx):
         song_cache.clear()
