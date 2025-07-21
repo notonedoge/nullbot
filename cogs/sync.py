@@ -11,8 +11,11 @@ class Sync(commands.Cog):
     @commands.command(hidden=True)
     async def sync(self, ctx):
         try:
-            fmt = await self.bot.tree.sync()
-            embed = discord.Embed(title='done.', description=f'synced {len(fmt)} commands')
+            global_cmd = await self.bot.tree.sync()
+            guild_cmd = await self.bot.tree.sync(guild=1187525934400671814)
+            embed = discord.Embed(title='done.', description=f'')
+            embed.add_field(name='', value=f'registered {len(global_cmd)} global commands')
+            embed.add_field(name='', value=f'registered {len(guild_cmd)} guild commands')
             await ctx.reply(embed=embed)
         except:
             err = traceback.format_exc()
