@@ -96,7 +96,7 @@ class Media(commands.Cog):
         await ctx.reply("Cache cleared.")
 
     @commands.command()
-    async def ms(self, ctx):
+    async def linksong(self, ctx):
         try:
             message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
             if match := self.pattern.search(message.content.strip("<>")):

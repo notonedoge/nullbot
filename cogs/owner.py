@@ -37,7 +37,9 @@ class Owner(commands.Cog):
         try:
             await self.bot.load_extension(f'cogs.{extension}')
             await ctx.message.add_reaction("✅")
-            fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+            fmt = await self.bot.tree.sync(guild=ctx.guild)
+            guild_cmd = await self.bot.tree.sync(guild=discord.Object(id=1187525934400671814))
+
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
 
@@ -50,7 +52,8 @@ class Owner(commands.Cog):
             #await self.bot.reload_extension(f'cogs.{extension}')
             #await ctx.message.remove_reaction("<a:load:1332186697823162489>", self.bot.user)
             #await ctx.message.add_reaction("✅")
-            fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+            fmt = await self.bot.tree.sync(guild=ctx.guild)
+            guild_cmd = await self.bot.tree.sync(guild=discord.Object(id=1187525934400671814))
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
 
@@ -63,7 +66,8 @@ class Owner(commands.Cog):
             module_name = os.path.splitext(os.path.relpath(file_path, start='./cogs'))[0].replace(os.sep, '.')
             await self.bot.load_extension(f'cogs.{module_name}')
 
-        fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+        fmt = await self.bot.tree.sync(guild=ctx.guild)
+        guild_cmd = await self.bot.tree.sync(guild=discord.Object(id=1187525934400671814))
         await ctx.message.remove_reaction("<a:load:1332186697823162489>", self.bot.user)
         await ctx.message.add_reaction("✅")
 
@@ -76,7 +80,8 @@ class Owner(commands.Cog):
             if module_name != 'owner':
                 await self.bot.unload_extension(f'cogs.{module_name}')
 
-        fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+        fmt = await self.bot.tree.sync(guild=ctx.guild)
+        guild_cmd = await self.bot.tree.sync(guild=discord.Object(id=1187525934400671814))
         await ctx.message.remove_reaction("<a:load:1332186697823162489>", self.bot.user)
         await ctx.message.add_reaction("✅")
 
@@ -89,7 +94,8 @@ class Owner(commands.Cog):
             module_name = os.path.splitext(os.path.relpath(file_path, start='./cogs'))[0].replace(os.sep, '.')
             await self.bot.reload_extension(f'cogs.{module_name}')
 
-        fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+        fmt = await self.bot.tree.sync(guild=ctx.guild)
+        guild_cmd = await self.bot.tree.sync(guild=discord.Object(id=1187525934400671814))
         await ctx.message.remove_reaction("<a:load:1332186697823162489>", self.bot.user)
         await ctx.message.add_reaction("✅")
 
@@ -97,6 +103,7 @@ class Owner(commands.Cog):
     async def restart(self, ctx):
         msg = await ctx.send('now restarting')
         try:
+            print(os.getcwd())
             subprocess.run("sudo ./home/ubuntu/nullbot/restart.sh", shell=True)
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
