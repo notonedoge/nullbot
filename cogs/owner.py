@@ -1,5 +1,6 @@
+import sys
 import traceback
-
+import git
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -103,8 +104,10 @@ class Owner(commands.Cog):
     async def restart(self, ctx):
         msg = await ctx.send('now restarting')
         try:
-            print(os.getcwd())
-            subprocess.run("sudo ./restart.sh", shell=True)
+            g = git.cmd.Git(os.getcwd())
+            g.pull()
+            print('done')
+            os.execv(sys.executable, [sys.executable] + sys.argv)
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
 
