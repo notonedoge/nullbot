@@ -133,7 +133,7 @@ class Owner(commands.Cog):
 
 
     @commands.command()
-    async def ccg(self, ctx):
+    async def comd(self, ctx):
         try:
             await self.bot.tree.clear_commands(guild=None)
             await ctx.reply('tst')
