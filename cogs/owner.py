@@ -138,7 +138,7 @@ class Owner(commands.Cog):
         try:
             await self.bot.tree.clear_commands(guild=None)
         except:
-            await ctx.reply(embed=embeds.error(traceback.format_exc()))
+            await ctx.reply(traceback.format_exc())
         await ctx.reply('tst')
 
 async def setup(bot):
