@@ -133,10 +133,10 @@ class Owner(commands.Cog):
 
 
     @commands.command()
-    @commands.is_owner()
     async def ccg(self, ctx):
         try:
             await self.bot.tree.clear_commands(guild=None)
+            await ctx.reply('tst')
         except:
             await ctx.reply(traceback.format_exc())
         await ctx.reply('tst')
