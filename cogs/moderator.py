@@ -74,7 +74,7 @@ class Moderator(commands.Cog):
     async def kick(self, interaction, member: discord.Member, reason: str):
         try:
             if member.top_role.position >= interaction.user.top_role.position:
-                await interaction.response.send_message('You cannot kick this member (higher or equal role).', ephemeral=True)
+                await interaction.response.send_message('You cannot kick this member', ephemeral=True)
                 return
 
             view = KickConfirmation(member, reason, interaction.user)

@@ -24,6 +24,7 @@ class Twitch(commands.Cog):
 
     group = app_commands.Group(name="twitch", description="Twitch livestream notifications")
 
+    @commands.guild_only()
     @group.command(name="add", description="Track a twitch channel")
     async def add(self, ctx, streamer_username: str, channel: discord.TextChannel):
         channel_id = str(channel.id)

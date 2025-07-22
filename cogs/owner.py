@@ -106,12 +106,11 @@ class Owner(commands.Cog):
         try:
             g = git.cmd.Git(os.getcwd())
             g.pull()
-            print('done')
             os.execv(sys.executable, [sys.executable] + sys.argv)
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.guild_only()
     @commands.has_guild_permissions(manage_messages=True)
     async def purge(self, ctx, count: int):
@@ -130,6 +129,13 @@ class Owner(commands.Cog):
             embed = discord.Embed(title=f'{count} Message{s} Purged')
             embed.add_field(name=f'Sent by', value={ctx.author.user.name})
             await channel.send(embed=embed)
+
+
+
+    @commands.command()
+    @commands.is_owner()
+    async def ccg(self):
+        await self.bot.tree.clear_commands(guild=None)
 
 async def setup(bot):
     await bot.add_cog(Owner(bot))
