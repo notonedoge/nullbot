@@ -134,8 +134,12 @@ class Owner(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def ccg(self):
-        await self.bot.tree.clear_commands(guild=None)
+    async def ccg(self, ctx):
+        try:
+            await self.bot.tree.clear_commands(guild=None)
+        except:
+            await ctx.reply(embed=embeds.error(traceback.format_exc()))
+        await ctx.reply('tst')
 
 async def setup(bot):
     await bot.add_cog(Owner(bot))
