@@ -66,7 +66,7 @@ class Ryder(commands.Cog):
             if str(after.nick).startswith("MEGA"): return
             if before.nick != after.nick:
                 if not after.nick:
-                    username = after.name
+                    username = after.username
                 else:
                     username = after.nick
                 nickname = str(f"MEGA " + username).upper()
