@@ -46,7 +46,7 @@ class Ryder(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         try:
-            if member.guild != 1187525934400671814: return
+            if member.guild.id != 1187525934400671814: return
             if not member.nick:
                 username = member.name
             else:
@@ -62,7 +62,7 @@ class Ryder(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         try:
-            if before.guild != 1187525934400671814: return
+            if before.guild.id != 1187525934400671814: return
             if str(after.nick).startswith("MEGA"): return
             if before.nick != after.nick:
                 if not after.nick:
