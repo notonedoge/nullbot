@@ -46,7 +46,11 @@ class Ryder(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         try:
-            nickname = str(f"MEGA " + member.nick).upper()
+            if not member.nick:
+                username = member.name
+            else:
+                username = member.nick
+            nickname = str(f"MEGA " + username).upper()
             await member.edit(nick=nickname)
         except Exception as e:
             print(traceback.format_exc())
@@ -60,7 +64,11 @@ class Ryder(commands.Cog):
             if before.guild != 1187525934400671814: return
             if str(after.nick).startswith("MEGA"): return
             if before.nick != after.nick:
-                nickname=str(f"MEGA "+ after.nick).upper()
+                if not after.nick:
+                    username = after.name
+                else:
+                    username = after.nick
+                nickname = str(f"MEGA " + username).upper()
                 await before.edit(nick=nickname)
         except Exception as e:
             c_id = 1190412893703909416
