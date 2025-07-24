@@ -54,6 +54,7 @@ class Ryder(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         try:
+            if before.guild != 1187525934400671814: return
             if str(after.nick).startswith("MEGA"): return
             if before.nick != after.nick:
                 nickname=str(f"MEGA "+ after.nick).upper()
