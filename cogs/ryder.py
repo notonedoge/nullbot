@@ -48,9 +48,9 @@ class Ryder(commands.Cog):
         try:
             if member.guild.id != 1187525934400671814: return
             if not member.nick:
-                username = member.user.nick
+                username = member.nick
             else:
-                username = member.user.nick
+                username = member.nick
             nickname = str(f"MEGA " + username).upper()
             await member.edit(nick=nickname)
         except Exception as e:
@@ -66,7 +66,7 @@ class Ryder(commands.Cog):
             if str(after.nick).startswith("MEGA"): return
             if before.nick != after.nick:
                 if not after.nick:
-                    username = after.user.nick
+                    username = after.nick
                 else:
                     username = after.nick
                 nickname = str(f"MEGA " + username).upper()
