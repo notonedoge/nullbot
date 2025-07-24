@@ -44,6 +44,14 @@ class Ryder(commands.Cog):
                 return
 
     @commands.Cog.listener()
+    async def on_member_join(self, member):
+        try:
+            nickname = str(f"MEGA " + member.nick).upper()
+            await member.edit(nick=nickname)
+        except Exception as e:
+            print(traceback.format_exc())
+
+    @commands.Cog.listener()
     async def on_member_update(self, before, after):
         try:
             if str(after.nick).startswith("MEGA"): return
