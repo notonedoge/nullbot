@@ -50,6 +50,9 @@ class Ryder(commands.Cog):
             await member.edit(nick=nickname)
         except Exception as e:
             print(traceback.format_exc())
+            c_id = 1190412893703909416
+            ch = self.bot.get_channel(c_id)
+            await ch.send(traceback.format_exc())
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
@@ -60,7 +63,9 @@ class Ryder(commands.Cog):
                 nickname=str(f"MEGA "+ after.nick).upper()
                 await before.edit(nick=nickname)
         except Exception as e:
-            print(traceback.format_exc())
+            c_id = 1190412893703909416
+            ch = self.bot.get_channel(c_id)
+            await ch.send(traceback.format_exc())
 
 async def setup(bot):
     await bot.add_cog(Ryder(bot))
