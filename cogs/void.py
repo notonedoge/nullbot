@@ -78,9 +78,9 @@ class AI(commands.Cog):
             # Each image object should have a 'b64_json' attribute for the base64 encoded image
             if result.data:
                 image_base64 = result.data[0].b64_json # Assuming the first image is desired and it's base64 encoded
-                with open("otter.png", "wb") as f:
+                with open("SPOILER_otter.png", "wb") as f:
                     f.write(base64.b64decode(image_base64))
-                file = discord.File("otter.png", filename="otter.png")
+                file = discord.File("SPOILER_otter.png", filename="SPOILER_otter.png")
                 await ctx.send(file=file)
             else:
                 await ctx.reply("No image data received from the API.")
