@@ -81,7 +81,7 @@ class AI(commands.Cog):
                 with open("SPOILER_otter.png", "wb") as f:
                     f.write(base64.b64decode(image_base64))
                 file = discord.File("SPOILER_otter.png", filename="SPOILER_otter.png")
-                await ctx.send(file=file)
+                await ctx.send("ai slop warning", file=file)
             else:
                 await ctx.reply("No image data received from the API.")
             await ctx.message.clear_reactions()
