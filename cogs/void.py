@@ -97,7 +97,7 @@ class AI(commands.Cog):
 
             messages.append({"role": "user", "content": prompt})
             response = client.chat.completions.create(
-                model="grok-3-fast-beta",
+                model="grok-3-fast",
                 messages=messages
             )
 
