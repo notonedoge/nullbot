@@ -91,21 +91,7 @@ class Moderator(commands.Cog):
             await interaction.response.send_message(f"Error:\n```{traceback.format_exc()}```", ephemeral=True)
 
 
-    @commands.command(name="muteben")
-    async def muteben(self, ctx):
-        ben = await ctx.guild.fetch_member(639281094889570323)
-        global muteben
-        muteben = True
-        await ctx.reply('muted')
-        while muteben:
-            await ben.edit(mute=True)
-            time.sleep(0.5)
 
-    @commands.command(name="unmuteben")
-    async def unmuteben(self, ctx):
-        global muteben
-        muteben = False
-        await ctx.reply('unmuted')
 
 
 async def setup(bot):
