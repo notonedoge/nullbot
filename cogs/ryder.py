@@ -76,7 +76,7 @@ class Ryder(commands.Cog):
             ch = self.bot.get_channel(c_id)
             await ch.send(traceback.format_exc())
 
-    @commands.Cog.listener()
+    @commands.command()
     async def calculate(self, ctx):
         await ctx.reply('stage one')
         try:
