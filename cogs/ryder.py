@@ -76,5 +76,19 @@ class Ryder(commands.Cog):
             ch = self.bot.get_channel(c_id)
             await ch.send(traceback.format_exc())
 
+    @commands.Cog.listener()
+    async def calculate(self, ctx):
+        await ctx.reply('stage one')
+        try:
+            for channel in ctx.guild.channels:
+                chan_msg = await ctx.reply(f'channel {channel}')
+                history = channel.history()
+                await chan_msg.edit(f'channel {channel} has {len(history)} messages')
+                for message in history:
+                    print(message.author)
+        except Exception as e:
+            c_id = 1190412893703909416
+            ch = self.bot.get_channel(c_id)
+            await ch.send(traceback.format_exc())
 async def setup(bot):
     await bot.add_cog(Ryder(bot))
