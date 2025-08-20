@@ -106,7 +106,7 @@ class Owner(commands.Cog):
         try:
             g = git.cmd.Git(os.getcwd())
             g.pull()
-            await msg.edit(content=f'finished git update.. restarting now')
+            await msg.edit(content=f'finished git update.. restarting now', delete_after=5)
             os.execv(sys.executable, [sys.executable] + sys.argv)
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
