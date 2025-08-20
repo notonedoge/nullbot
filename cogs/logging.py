@@ -85,7 +85,7 @@ class Logging(commands.Cog):
         embed = discord.Embed(title="Member Joined", description=f'{member.nick} ({member.name})')
         embed.add_field(name="Joined at", value=f'<t:{int(member.joined_at.timestamp())}>')
         embed.add_field(name="Account Created at", value=f'<t:{int(member.created_at.timestamp())}>')
-        c_id = data[member.guild.id]["server_log"]
+        c_id = data[member.guild.id]["member_log"]
         ch = self.bot.get_channel(c_id)
         await ch.send(embed=embed)
 
