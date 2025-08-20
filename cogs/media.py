@@ -7,6 +7,11 @@ from discord.ext import commands
 import os
 import requests
 import re
+import yaml
+
+
+with open("data.yml", "r") as file:
+    data = yaml.safe_load(file)
 
 song_cache = {}
 
@@ -86,8 +91,12 @@ class Media(commands.Cog):
                 await message.clear_reaction("⏳")
 
         except:
+            c_id = data[message.guild.id]["server_log"]  # server logging channel
+            ch = self.bot.get_channel(c_id)
             log = traceback.format_exc()
-            await message.reply(f"```{log}```")
+            await ch.send(f"## song.link cog has thrown problem :((("
+                                f"```{log}```")
+            await message.reply(f"```{log}```", delete_after=5)
 
 
     @commands.command(hidden=True)
