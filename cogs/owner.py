@@ -105,7 +105,9 @@ class Owner(commands.Cog):
         msg = await ctx.send('now restarting')
         try:
             g = git.cmd.Git(os.getcwd())
+            changedFiles = [item.a_path for item in g.index.diff(None)]
             g.pull()
+            await msg.edit(content=f'now restarting\nchanged files:\n{changedFiles}')
             os.execv(sys.executable, [sys.executable] + sys.argv)
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
@@ -131,15 +133,6 @@ class Owner(commands.Cog):
             await channel.send(embed=embed)
 
 
-
-    @commands.command()
-    async def ccg(self, ctx):
-        try:
-            await self.bot.tree.clear_commands(guild=None)
-            await ctx.reply('tst')
-        except:
-            await ctx.reply(traceback.format_exc())
-        await ctx.reply('tst')
 
 async def setup(bot):
     await bot.add_cog(Owner(bot))
