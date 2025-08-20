@@ -102,12 +102,11 @@ class Owner(commands.Cog):
 
     @commands.command(hidden=True)
     async def restart(self, ctx):
-        msg = await ctx.send('now restarting')
+        msg = await ctx.send('sent request')
         try:
             g = git.cmd.Git(os.getcwd())
-            changedFiles = [item.a_path for item in g.index.diff(None)]
             g.pull()
-            await msg.edit(content=f'now restarting\nchanged files:\n{changedFiles}')
+            await msg.edit(content=f'finished git update.. restarting now')
             os.execv(sys.executable, [sys.executable] + sys.argv)
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
