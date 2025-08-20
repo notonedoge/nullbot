@@ -78,17 +78,49 @@ class Ryder(commands.Cog):
 
     @commands.command()
     async def calculate(self, ctx):
-        await ctx.reply('stage one')
-        try:
-            for channel in ctx.guild.channels:
-                chan_msg = await ctx.reply(f'channel {channel}')
-                history = channel.history()
-                await chan_msg.edit(f'channel {channel} has {len(history)} messages')
-                for message in history:
-                    print(message.author)
-        except Exception as e:
-            c_id = 1190412893703909416
-            ch = self.bot.get_channel(c_id)
-            await ch.send(traceback.format_exc())
+        message_counts = {}
+        await ctx.reply('Starting to count messages...')
+
+        # We will only count messages in text channels
+        text_channels = [c for c in ctx.guild.channels if isinstance(c, discord.TextChannel)]
+
+        for channel in text_channels:
+            # Send a status update
+            status_message = await ctx.send(f'Processing channel: {channel.mention}')
+
+            try:
+                async for message in channel.history(limit=None):  # Use limit=None to get all messages
+                    print(message.content)
+                    author = message.author
+                    if author not in message_counts:
+                        message_counts[author] = 0
+                    message_counts[author] += 1
+
+            except discord.Forbidden:
+                await status_message.edit(
+                    content=f'Skipping channel {channel.mention} due to insufficient permissions.')
+                continue  # Skip to the next channel if the bot can't access it
+
+            except Exception as e:
+                await status_message.edit(content=f'An error occurred in channel {channel.mention}: {e}')
+                c_id = 1190412893703909416
+                ch = self.bot.get_channel(c_id)
+                if ch:
+                    await ch.send(
+                        f'Error processing channel {channel.mention}:\n```python\n{traceback.format_exc()}```')
+                continue
+
+        if not message_counts:
+            return await ctx.send('No messages found in the accessible channels.')
+        print(message_counts)
+        sorted_counts = sorted(message_counts.items(), key=lambda item: item[1], reverse=True)
+
+        output = "Message Counts by User:\n"
+        for author, count in sorted_counts[:10]:  # Show the top 10 users
+            output += f"**{author.display_name}**: {count} messages\n"
+
+        await ctx.send(output)
+
+
 async def setup(bot):
     await bot.add_cog(Ryder(bot))
