@@ -7,6 +7,7 @@ from colorama import Fore
 from dotenv import load_dotenv
 import subprocess
 
+
 load_dotenv()
 
 
@@ -16,7 +17,7 @@ bot = commands.Bot(
     command_prefix=',',
     intents=intents,
     application_id=1345951741144989766,
-    activity=discord.Game(name=",xp"),
+    activity=discord.Game(name="what"),
 )
 
 

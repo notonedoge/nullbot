@@ -42,5 +42,7 @@ class Sync(commands.Cog):
             await ctx.reply(err)
 
 
+
+
 async def setup(bot):
     await bot.add_cog(Sync(bot), guilds=[discord.Object(id=1226051359066030111), discord.Object(1187525934400671814)])
