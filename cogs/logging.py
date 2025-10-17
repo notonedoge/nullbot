@@ -82,7 +82,7 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        embed = discord.Embed(title="Member Joined", description=f'{member.nick} ({member.name})')
+        embed = discord.Embed(title="Member Joined", description=f'{member.user.nick} ({member.name})')
         embed.add_field(name="Joined at", value=f'<t:{int(member.joined_at.timestamp())}>')
         embed.add_field(name="Account Created at", value=f'<t:{int(member.created_at.timestamp())}>')
         c_id = data[member.guild.id]["member_log"]

@@ -89,7 +89,7 @@ class AI(commands.Cog):
             if self.bot.user.mentioned_in(message):
                 await message.add_reaction('⏳')
 
-                modified_msg = re.sub(r'<@!?%s>' % self.bot.user.id, "", message.content).strip()
+                modified_msg = re.sub(r'<@!?%s>' % self.bot.user.id, ".", message.content).strip()
                 attachment_urls = []
                 msgs = [
                     {"role": "system", "content": prompt}
