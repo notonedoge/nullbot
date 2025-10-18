@@ -47,7 +47,7 @@ class Media(commands.Cog):
                     song_cache[link] = song
                 info = song.json()
 
-                if not info["entityUniqueId"]: return
+                if not "entityUniqueId" in info: return
                 songid = info["entityUniqueId"]
                 title = info["entitiesByUniqueId"][songid]["title"]
                 author = info["entitiesByUniqueId"][songid]["artistName"]
