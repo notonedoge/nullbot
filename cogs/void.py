@@ -123,7 +123,6 @@ class AI(commands.Cog):
                 if message.attachments:
                     user_prompt = [{"type": "text", "text": modified_msg}]
                     for attachment in message.attachments:
-                        print(attachment.url, attachment.content_type)
 
                         if attachment.content_type and attachment.content_type.startswith('image'):
                             attachment_urls.append(attachment.url)
