@@ -147,7 +147,7 @@ class TwitchCog(commands.Cog):
         channel = self.bot.get_channel(1187531474031890592)
         if channel:
             embed = discord.Embed(
-                title="🔴 Stream is Live!",
+                title="🔴 Now live",
                 description=f"**{data.event.broadcaster_user_name}** is now streaming!",
                 color=discord.Color.purple(),
                 url=f"https://twitch.tv/{data.event.broadcaster_user_login}"
@@ -161,7 +161,7 @@ class TwitchCog(commands.Cog):
 
     async def on_stream_offline(self, data: StreamOfflineEvent):
         """Called when stream goes offline"""
-        print(f'⚫ Stream is now OFFLINE!')
+        print(f'⚫ Stream is now offline')
         print(f'   Broadcaster: {data.event.broadcaster_user_name}')
 
         self.is_live = False
