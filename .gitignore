@@ -5,3 +5,4 @@ __pycache__
 i.png
 disabled/ollama.py
 data/twitch.yml
+twitch_tokens.json
