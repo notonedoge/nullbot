@@ -10,83 +10,188 @@ import yaml
 from pathlib import Path
 import dotenv
 
-import threading
+import json
+
+from twitchAPI.twitch import Twitch
+from twitchAPI.helper import first
+from twitchAPI.oauth import UserAuthenticator
+from twitchAPI.type import AuthScope
+from twitchAPI.eventsub.websocket import EventSubWebsocket
+from twitchAPI.object.eventsub import StreamOnlineEvent, StreamOfflineEvent
+
 
 
 
 dotenv.load_dotenv()
 
-from twitchAPI.helper import first
-from twitchAPI.twitch import Twitch
-from twitchAPI.eventsub.webhook import EventSubWebhook
-from twitchAPI.object.eventsub import StreamOnlineEvent
-from twitchAPI.object.eventsub import StreamOfflineEvent
-from twitchAPI.oauth import UserAuthenticator
-from twitchAPI.type import AuthScope
-
-
-EVENTSUB_URL = 'https://echolocation.cc/api/twitch-webhook'
 CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
 CLIENT_SECRET = os.getenv('TWITCH_CLIENT_SECRET')
+TARGET_SCOPES = [AuthScope.USER_READ_EMAIL]
+TARGET_CHANNEL = 'xarrak99'
+TOKEN_FILE = 'twitch_tokens.json'
+
+def save_tokens(token, refresh_token):
+    with open(TOKEN_FILE, 'w') as f:
+        json.dump({'token': token, 'refresh_token': refresh_token}, f)
+    print("✓ Tokens saved")
+
+
+def load_tokens():
+    if os.path.exists(TOKEN_FILE):
+        with open(TOKEN_FILE, 'r') as f:
+            data = json.load(f)
+            return data['token'], data['refresh_token']
+    return None, None
 
 
 class TwitchCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.path = Path('data/twitch.yml')
-        if not self.path.exists():
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            self.path.touch()
+        self.twitch = None
+        self.eventsub = None
+        self.user_id = None
+        self.is_live = False
 
-        with open(self.path, "r") as file:
-            self.twitch_data = yaml.safe_load(file) or {}
+    async def cog_load(self):
+        """Called when cog is loaded"""
+        await self.setup_twitch()
 
+    async def cog_unload(self):
+        """Cleanup when cog is unloaded"""
+        await self.cleanup()
 
-        self.twitch = Twitch(CLIENT_ID, CLIENT_SECRET)
+    async def cleanup(self):
+        """Clean up Twitch connections"""
+        try:
+            if self.eventsub:
+                await self.eventsub.stop()
+            if self.twitch:
+                await self.twitch.close()
+            print("✓ Twitch connections cleaned up")
+        except Exception as e:
+            print(f"Error during cleanup: {e}")
 
-        self.eventsub = EventSubWebhook(EVENTSUB_URL, 9000, self.twitch)
+    async def setup_twitch(self):
+        """Initialize Twitch API and EventSub"""
+        try:
+            print("Setting up Twitch integration...")
 
+            # Initialize Twitch API
+            self.twitch = await Twitch(CLIENT_ID, CLIENT_SECRET)
 
-    async def stream_online(self, data: StreamOnlineEvent):
-        print("Received stream.online event:", data.event)
-        broadcaster = data.event.broadcaster_user_name
-        for channel_id, data in self.twitch_data.items():
-            if broadcaster.lower() in [s.lower() for s in data.get('streams', [])]:
-                channel = self.bot.get_channel(int(channel_id))
-                if channel:
-                    await channel.send(f"{broadcaster} live")
+            # Load or authenticate tokens
+            token, refresh_token = load_tokens()
 
+            if token and refresh_token:
+                print("Using saved Twitch tokens...")
+                try:
+                    await self.twitch.set_user_authentication(token, TARGET_SCOPES, refresh_token)
+                    print("✓ Authenticated with saved tokens")
+                except Exception as e:
+                    print(f"Saved tokens invalid: {e}")
+                    token, refresh_token = None, None
 
-    group = app_commands.Group(name="twitch", description="Twitch livestream notifications")
+            # If no valid tokens, authenticate
+            if not token:
+                print("Authenticating with Twitch (browser will open)...")
+                auth = UserAuthenticator(self.twitch, TARGET_SCOPES)
+                token, refresh_token = await auth.authenticate()
+                await self.twitch.set_user_authentication(token, TARGET_SCOPES, refresh_token)
+                save_tokens(token, refresh_token)
+                print("✓ Twitch authentication complete")
 
-    @commands.guild_only()
-    @group.command(name="add", description="Track a twitch channel")
-    async def add(self, ctx, streamer_username: str, channel: discord.TextChannel):
-        channel_id = str(channel.id)
-        if channel_id not in self.twitch_data:
-            self.twitch_data[channel_id] = {'streams': []}
-        if streamer_username.lower() not in [s.lower() for s in self.twitch_data[channel_id]['streams']]:
-            self.twitch_data[channel_id]['streams'].append(streamer_username)
-        with open(self.path, "w") as file:
-            yaml.safe_dump(self.twitch_data, file)
-        await ctx.response.send_message(f"added **{streamer_username}** to notifications in {channel.mention}.")
+            # Get the user ID for the target channel
+            user = await first(self.twitch.get_users(logins=[TARGET_CHANNEL]))
+            if not user:
+                print(f"❌ User {TARGET_CHANNEL} not found!")
+                return
 
+            self.user_id = user.id
+            print(f"Found user: {user.display_name} (ID: {self.user_id})")
 
-  #  async def cog_load(self):
-#
-       # self.eventsub.start()
-#
-       # await self.twitch.authenticate_app([])
-#
-       # await self.eventsub.unsubscribe_all()
-       # for data in self.twitch_data.values():
-       #     for streamer in data.get('streams', []):
-       #         user = await first(self.twitch.get_users(logins=[streamer]))
-       #         if user:
-       #             uid = user.id
-       #             await self.eventsub.listen_stream_online(uid, self.stream_online)
+            # Set up EventSub WebSocket
+            self.eventsub = EventSubWebsocket(self.twitch)
+            self.eventsub.start()
+            print("EventSub WebSocket connected")
 
+            # Subscribe to events
+            await self.eventsub.listen_stream_online(
+                broadcaster_user_id=self.user_id,
+                callback=self.on_stream_online
+            )
+            print("✓ Subscribed to stream online events")
 
+            await self.eventsub.listen_stream_offline(
+                broadcaster_user_id=self.user_id,
+                callback=self.on_stream_offline
+            )
+            print("✓ Subscribed to stream offline events")
+
+            print("🚀 Twitch EventSub is running!\n")
+
+        except Exception as e:
+            print(f"❌ Error setting up Twitch: {e}")
+            import traceback
+            traceback.print_exc()
+
+    async def on_stream_online(self, data: StreamOnlineEvent):
+        """Called when stream goes online"""
+        print(f'🔴 Stream is now ONLINE!')
+        print(f'   Broadcaster: {data.event.broadcaster_user_name}')
+        print(f'   Started at: {data.event.started_at}')
+        print(f'   Type: {data.event.type}')
+
+        self.is_live = True
+
+        # Send Discord notification
+        channel = self.bot.get_channel(1187531474031890592)
+        if channel:
+            embed = discord.Embed(
+                title="🔴 Stream is Live!",
+                description=f"**{data.event.broadcaster_user_name}** is now streaming!",
+                color=discord.Color.purple(),
+                url=f"https://twitch.tv/{data.event.broadcaster_user_login}"
+            )
+            embed.add_field(name="Started", value=f"<t:{int(data.event.started_at.timestamp())}:R>")
+            embed.add_field(name="Type", value=data.event.type.capitalize())
+            embed.set_thumbnail(
+                url="https://static-cdn.jtvnw.net/jtv_user_pictures/8a6381c7-d0c0-4576-b179-38bd5ce1d6af-profile_image-300x300.png")
+
+            await channel.send(embed=embed)
+
+    async def on_stream_offline(self, data: StreamOfflineEvent):
+        """Called when stream goes offline"""
+        print(f'⚫ Stream is now OFFLINE!')
+        print(f'   Broadcaster: {data.event.broadcaster_user_name}')
+
+        self.is_live = False
+
+        # Send Discord notification
+        channel = self.bot.get_channel(1187531474031890592)
+        if channel:
+            embed = discord.Embed(
+                title="⚫ Stream Ended",
+                description=f"**{data.event.broadcaster_user_name}** is now offline.",
+                color=discord.Color.dark_gray()
+            )
+            await channel.send(embed=embed)
+
+    @commands.command(name='livestatus')
+    async def live_status(self, ctx):
+        """Check if stream is currently live"""
+        if self.is_live:
+            await ctx.send(f"🔴 {TARGET_CHANNEL} is currently live on Twitch")
+        else:
+            await ctx.send(f"⚫ {TARGET_CHANNEL} is currently **offline**.")
+
+    @commands.command(name='reloadtwitch')
+    @commands.has_permissions(administrator=True)
+    async def reload_twitch(self, ctx):
+        """Reload Twitch integration (Admin only)"""
+        await ctx.send("Reloading Twitch integration...")
+        await self.cleanup()
+        await self.setup_twitch()
+        await ctx.send("✓ Twitch integration reloaded!")
 
 async def setup(bot):
     await bot.add_cog(TwitchCog(bot))
