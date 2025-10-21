@@ -111,6 +111,11 @@ class Owner(commands.Cog):
         except:
             await ctx.reply(embed=embeds.error(traceback.format_exc()), content=traceback.print_exc())
 
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def stop(self, ctx):
+        exit(0)
+
     @commands.command()
     @commands.guild_only()
     @commands.has_guild_permissions(manage_messages=True)
