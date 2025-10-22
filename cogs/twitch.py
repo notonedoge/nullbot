@@ -30,6 +30,7 @@ TARGET_SCOPES = [AuthScope.USER_READ_EMAIL]
 TARGET_CHANNEL = 'xarrak99'
 TOKEN_FILE = 'twitch_tokens.json'
 
+
 def save_tokens(token, refresh_token):
     with open(TOKEN_FILE, 'w') as f:
         json.dump({'token': token, 'refresh_token': refresh_token}, f)
@@ -53,15 +54,12 @@ class TwitchCog(commands.Cog):
         self.is_live = False
 
     async def cog_load(self):
-        """Called when cog is loaded"""
         await self.setup_twitch()
 
     async def cog_unload(self):
-        """Cleanup when cog is unloaded"""
         await self.cleanup()
 
     async def cleanup(self):
-        """Clean up Twitch connections"""
         try:
             if self.eventsub:
                 await self.eventsub.stop()
@@ -72,14 +70,10 @@ class TwitchCog(commands.Cog):
             print(f"Error during cleanup: {e}")
 
     async def setup_twitch(self):
-        """Initialize Twitch API and EventSub"""
         try:
             print("Setting up Twitch integration...")
 
-            # Initialize Twitch API
             self.twitch = await Twitch(CLIENT_ID, CLIENT_SECRET)
-
-            # Load or authenticate tokens
             token, refresh_token = load_tokens()
 
             if token and refresh_token:
@@ -91,7 +85,6 @@ class TwitchCog(commands.Cog):
                     print(f"Saved tokens invalid: {e}")
                     token, refresh_token = None, None
 
-            # If no valid tokens, authenticate
             if not token:
                 print("Authenticating with Twitch (browser will open)...")
                 auth = UserAuthenticator(self.twitch, TARGET_SCOPES)
@@ -100,7 +93,6 @@ class TwitchCog(commands.Cog):
                 save_tokens(token, refresh_token)
                 print("✓ Twitch authentication complete")
 
-            # Get the user ID for the target channel
             user = await first(self.twitch.get_users(logins=[TARGET_CHANNEL]))
             if not user:
                 print(f"❌ User {TARGET_CHANNEL} not found!")
@@ -109,12 +101,10 @@ class TwitchCog(commands.Cog):
             self.user_id = user.id
             print(f"Found user: {user.display_name} (ID: {self.user_id})")
 
-            # Set up EventSub WebSocket
             self.eventsub = EventSubWebsocket(self.twitch)
             self.eventsub.start()
             print("EventSub WebSocket connected")
 
-            # Subscribe to events
             await self.eventsub.listen_stream_online(
                 broadcaster_user_id=self.user_id,
                 callback=self.on_stream_online
@@ -134,64 +124,83 @@ class TwitchCog(commands.Cog):
             import traceback
             traceback.print_exc()
 
+    async def send_online_notification(self, data: StreamOnlineEvent):
+        try:
+            stream = await first(self.twitch.get_streams(user_id=[self.user_id]))
+
+            if not stream:
+                return
+
+            game_name = "Game Name"
+            if stream.game_id:
+                game = await first(self.twitch.get_games(game_ids=[stream.game_id]))
+                if game:
+                    game_name = game.name
+
+            thumbnail_url = stream.thumbnail_url.replace('{width}', '1920').replace('{height}', '1080')
+
+            user = await first(self.twitch.get_users(user_ids=[self.user_id]))
+            profile_image = user.profile_image_url if user else None
+
+            channel = self.bot.get_channel(1187531474031890592)
+            if channel:
+                embed = discord.Embed(
+                    title=f"**{data.event.broadcaster_user_name}** is now live on Twitch",
+                    description=stream.title or "Stream Name",
+                    color=discord.Color.purple(),
+                    url=f"https://twitch.tv/{data.event.broadcaster_user_login}"
+                )
+                embed.add_field(name="Category", value=game_name, inline=True)
+                embed.add_field(name="Viewers", value=str(stream.viewer_count), inline=True)
+                embed.set_image(url=thumbnail_url)
+
+                if profile_image:
+                    embed.set_thumbnail(url=profile_image)
+
+                embed.timestamp = data.event.started_at
+
+                await channel.send(embed=embed)
+        except Exception as e:
+            pass
+    async def send_offline_notification(self, data: StreamOfflineEvent):
+        try:
+            channel = self.bot.get_channel(1187531474031890592)
+            if channel:
+                await channel.send('Stream is now offline')
+        except Exception as e:
+            pass
     async def on_stream_online(self, data: StreamOnlineEvent):
-        """Called when stream goes online"""
-        print(f'🔴 Stream is now ONLINE!')
-        print(f'   Broadcaster: {data.event.broadcaster_user_name}')
-        print(f'   Started at: {data.event.started_at}')
-        print(f'   Type: {data.event.type}')
 
         self.is_live = True
 
-        # Send Discord notification
-        channel = self.bot.get_channel(1187531474031890592)
-        if channel:
-            embed = discord.Embed(
-                title="🔴 Now live",
-                description=f"**{data.event.broadcaster_user_name}** is now streaming!",
-                color=discord.Color.purple(),
-                url=f"https://twitch.tv/{data.event.broadcaster_user_login}"
-            )
-            embed.add_field(name="Started", value=f"<t:{int(data.event.started_at.timestamp())}:R>")
-            embed.add_field(name="Type", value=data.event.type.capitalize())
-            embed.set_thumbnail(
-                url="https://static-cdn.jtvnw.net/jtv_user_pictures/8a6381c7-d0c0-4576-b179-38bd5ce1d6af-profile_image-300x300.png")
-
-            await channel.send(embed=embed)
+        asyncio.run_coroutine_threadsafe(
+            self.send_online_notification(data),
+            self.bot.loop
+        )
 
     async def on_stream_offline(self, data: StreamOfflineEvent):
-        """Called when stream goes offline"""
-        print(f'⚫ Stream is now offline')
-        print(f'   Broadcaster: {data.event.broadcaster_user_name}')
-
         self.is_live = False
 
-        # Send Discord notification
-        channel = self.bot.get_channel(1187531474031890592)
-        if channel:
-            embed = discord.Embed(
-                title="⚫ Stream Ended",
-                description=f"**{data.event.broadcaster_user_name}** is now offline.",
-                color=discord.Color.dark_gray()
-            )
-            await channel.send(embed=embed)
+        asyncio.run_coroutine_threadsafe(
+            self.send_offline_notification(data),
+            self.bot.loop
+        )
 
     @commands.command(name='livestatus')
     async def live_status(self, ctx):
-        """Check if stream is currently live"""
         if self.is_live:
             await ctx.send(f"🔴 {TARGET_CHANNEL} is currently live on Twitch")
         else:
-            await ctx.send(f"⚫ {TARGET_CHANNEL} is currently **offline**.")
+            await ctx.send(f"⚫ {TARGET_CHANNEL} is currently offline")
 
     @commands.command(name='reloadtwitch')
     @commands.has_permissions(administrator=True)
     async def reload_twitch(self, ctx):
-        """Reload Twitch integration (Admin only)"""
         await ctx.send("Reloading Twitch integration...")
         await self.cleanup()
         await self.setup_twitch()
         await ctx.send("✓ Twitch integration reloaded!")
+
 
 async def setup(bot):
     await bot.add_cog(TwitchCog(bot))
