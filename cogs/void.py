@@ -93,8 +93,8 @@ class AI(commands.Cog):
                 await message.add_reaction('⏳')
                 grok = False
                 modified_msg = re.sub(r'<@!?%s>' % self.bot.user.id, ".", message.content).strip()
-                if "gemini" in modified_msg:
-                    modified_msg = re.sub(r'gemini', "", modified_msg).strip()
+                if "sonar" in modified_msg:
+                    modified_msg = re.sub(r'sonar', "", modified_msg).strip()
                     grok = True
                 attachment_urls = []
                 msgs = [
@@ -135,11 +135,11 @@ class AI(commands.Cog):
                 msgs.append({"role": "user", "content": user_prompt})
 
                 if grok:
-                    response = client.chat.completions.create(model="gemini-2.5-flash-lite-preview-06-17", messages=msgs)
-                    citations = None
-                else:
                     response = client.chat.completions.create(model="sonar", messages=msgs)
                     citations = response.citations
+                else:
+                    response = client.chat.completions.create(model="grok-4", messages=msgs)
+                    citations = None
 
 
 
