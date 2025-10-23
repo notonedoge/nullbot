@@ -21,7 +21,7 @@ class YT(commands.Cog):
 
             global prev_xml
             if prev_xml is None:
-                prev_xml = d.entries[1]
+                prev_xml = d.entries[0]
                 return
             if latest.link != prev_xml.link:
                 latest = d.entries[0]
