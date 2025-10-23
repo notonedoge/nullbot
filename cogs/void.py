@@ -135,7 +135,7 @@ class AI(commands.Cog):
                 msgs.append({"role": "user", "content": user_prompt})
 
                 if grok:
-                    response = client.chat.completions.create(model="grok-3-fast", messages=msgs)
+                    response = client.chat.completions.create(model="gemini-2.5-flash-lite-preview-06-17", messages=msgs)
                     citations = None
                 else:
                     response = client.chat.completions.create(model="sonar", messages=msgs)
