@@ -93,7 +93,7 @@ class AI(commands.Cog):
                 await message.add_reaction('⏳')
                 grok = False
                 modified_msg = re.sub(r'<@!?%s>' % self.bot.user.id, ".", message.content).strip()
-                if modified_msg.startswith("grok"):
+                if "grok" in modified_msg:
                     modified_msg = re.sub(r'grok', "", modified_msg).strip()
                     grok = True
                 attachment_urls = []
