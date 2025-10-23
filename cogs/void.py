@@ -131,9 +131,10 @@ class AI(commands.Cog):
                     user_prompt = [{"type": "text", "text": modified_msg}]
                 msgs.append({"role": "user", "content": user_prompt})
 
-                response = client.chat.completions.create(model="sonar-pro", messages=msgs)
+                response = client.chat.completions.create(model="grok-3-fast", messages=msgs)
 
-                citations = response.citations
+                #citations = response.citations
+                citations = None
                 view = None
                 if citations:
                     # Only create the button view if citations exist
