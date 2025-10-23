@@ -91,8 +91,11 @@ class AI(commands.Cog):
                 return
             if self.bot.user.mentioned_in(message):
                 await message.add_reaction('⏳')
-
+                grok = False
                 modified_msg = re.sub(r'<@!?%s>' % self.bot.user.id, ".", message.content).strip()
+                if modified_msg.startswith("grok"):
+                    modified_msg = re.sub(r'grok', "", modified_msg).strip()
+                    grok = True
                 attachment_urls = []
                 msgs = [
                     {"role": "system", "content": prompt}
@@ -131,10 +134,15 @@ class AI(commands.Cog):
                     user_prompt = [{"type": "text", "text": modified_msg}]
                 msgs.append({"role": "user", "content": user_prompt})
 
-                response = client.chat.completions.create(model="grok-3-fast", messages=msgs)
+                if grok:
+                    response = client.chat.completions.create(model="grok-3-fast", messages=msgs)
+                    citations = None
+                else:
+                    response = client.chat.completions.create(model="sonar", messages=msgs)
+                    citations = response.citations
 
-                #citations = response.citations
-                citations = None
+
+
                 view = None
                 if citations:
                     # Only create the button view if citations exist
