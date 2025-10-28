@@ -17,7 +17,7 @@ bot = commands.Bot(
     command_prefix=',',
     intents=intents,
     application_id=1345951741144989766,
-    activity=discord.Game(name="media fixed?"),
+    activity=discord.Game(name="efgedv"),
 )
 
 
