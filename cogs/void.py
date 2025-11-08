@@ -136,7 +136,7 @@ class AI(commands.Cog):
                     response = await client.chat.completions.create(model="sonar", messages=messages)
                     citations = response.citations
                 else:
-                    response = await client.chat.completions.create(model="grok-4", messages=messages)
+                    response = await client.chat.completions.create(model="qwq-32b", messages=messages)
                     citations = None
 
 
