@@ -133,10 +133,10 @@ class AI(commands.Cog):
                 messages.append({"role": "user", "content": f"{message.author.name} ({message.author}): {user_prompt}"})
 
                 if grok:
-                    response = client.chat.completions.create(model="sonar", messages=messages)
+                    response = await client.chat.completions.create(model="sonar", messages=messages)
                     citations = response.citations
                 else:
-                    response = client.chat.completions.create(model="grok-4", messages=messages)
+                    response = await client.chat.completions.create(model="grok-4", messages=messages)
                     citations = None
 
 
