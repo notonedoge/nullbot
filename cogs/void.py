@@ -5,7 +5,7 @@ import json
 import io
 from collections import defaultdict
 import re
-from openai import OpenAI
+from openai import AsyncOpenAI
 import base64
 from dotenv import load_dotenv
 import os
@@ -36,11 +36,10 @@ DO NOT, and i repeat DO NOT do any in text citations, such as [1] or [2]. They d
 """
 
 messages = [
-    prompt
-
+    {'role': 'system', 'content': prompt}
 ]
 
-client = OpenAI(
+client = AsyncOpenAI(
     api_key=os.getenv("VOID"),
     base_url="https://api.voidai.app/v1/"
 )
@@ -98,9 +97,7 @@ class AI(commands.Cog):
                     modified_msg = re.sub(r'sonar', "", modified_msg).strip()
                     grok = True
                 attachment_urls = []
-                msgs = [
-                    {"role": "system", "content": prompt}
-                ]
+
 
                 if message.reference and message.reference.message_id:
                     try:
@@ -115,7 +112,7 @@ class AI(commands.Cog):
                         )
 
 
-                        msgs.append({
+                        messages.append({
                             "role": "user",
                             "content": [{"type": "text", "text": context_text}]
                         })
@@ -133,13 +130,13 @@ class AI(commands.Cog):
                             user_prompt.append({"type": "image_url", "image_url": {"url":attachment.url}})
                 else:
                     user_prompt = [{"type": "text", "text": modified_msg}]
-                msgs.append({"role": "user", "content": user_prompt})
+                messages.append({"role": "user", "content": f"{message.author.name} ({message.author}): {user_prompt}"})
 
                 if grok:
-                    response = client.chat.completions.create(model="sonar", messages=msgs)
+                    response = client.chat.completions.create(model="sonar", messages=messages)
                     citations = response.citations
                 else:
-                    response = client.chat.completions.create(model="grok-4", messages=msgs)
+                    response = client.chat.completions.create(model="grok-4", messages=messages)
                     citations = None
 
 
