@@ -79,12 +79,14 @@ class Ryder(commands.Cog):
     @commands.command()
     async def calculate(self, ctx):
         message_counts = {}
-        await ctx.reply('Starting to count messages...')
+        current_channel = None
+        message = await ctx.reply('Starting to count messages...')
 
         text_channels = [c for c in ctx.guild.channels if isinstance(c, discord.TextChannel)]
 
         for channel in text_channels:
-            status_message = await ctx.send(f'Processing channel: {channel.mention}')
+            current_channel = channel
+            await message.edit(f'Processing channel: {channel.mention}')
 
             try:
                 async for message in channel.history(limit=None):  # Use limit=None to get all messages
@@ -94,22 +96,15 @@ class Ryder(commands.Cog):
                     message_counts[author] += 1
 
             except discord.Forbidden:
-                await status_message.edit(
+                await message.edit(
                     content=f'Skipping channel {channel.mention} due to insufficient permissions.')
                 continue
 
             except Exception as e:
-                await status_message.edit(content=f'An error occurred in channel {channel.mention}: {e}')
-                c_id = 1190412893703909416
-                ch = self.bot.get_channel(c_id)
-                if ch:
-                    await ch.send(
-                        f'Error processing channel {channel.mention}:\n```python\n{traceback.format_exc()}```')
-                continue
+                await message.edit(content=f'An error occurred in channel {channel.mention}: {e}')
 
         if not message_counts:
             return await ctx.send('No messages found in the accessible channels.')
-        print(message_counts)
         sorted_counts = sorted(message_counts.items(), key=lambda item: item[1], reverse=True)
 
         output = "Message Counts by User:\n"
