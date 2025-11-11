@@ -86,7 +86,7 @@ class Ryder(commands.Cog):
 
         for channel in text_channels:
             current_channel = channel
-            await message.edit(f'Processing channel: {channel.mention}')
+            await message.edit(content=f'Processing channel: {channel.mention}')
 
             try:
                 async for message in channel.history(limit=None):  # Use limit=None to get all messages
