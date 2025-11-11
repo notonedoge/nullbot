@@ -81,16 +81,13 @@ class Ryder(commands.Cog):
         message_counts = {}
         await ctx.reply('Starting to count messages...')
 
-        # We will only count messages in text channels
         text_channels = [c for c in ctx.guild.channels if isinstance(c, discord.TextChannel)]
 
         for channel in text_channels:
-            # Send a status update
             status_message = await ctx.send(f'Processing channel: {channel.mention}')
 
             try:
                 async for message in channel.history(limit=None):  # Use limit=None to get all messages
-                    print(message.content)
                     author = message.author
                     if author not in message_counts:
                         message_counts[author] = 0
@@ -99,7 +96,7 @@ class Ryder(commands.Cog):
             except discord.Forbidden:
                 await status_message.edit(
                     content=f'Skipping channel {channel.mention} due to insufficient permissions.')
-                continue  # Skip to the next channel if the bot can't access it
+                continue
 
             except Exception as e:
                 await status_message.edit(content=f'An error occurred in channel {channel.mention}: {e}')
@@ -116,7 +113,7 @@ class Ryder(commands.Cog):
         sorted_counts = sorted(message_counts.items(), key=lambda item: item[1], reverse=True)
 
         output = "Message Counts by User:\n"
-        for author, count in sorted_counts[:10]:  # Show the top 10 users
+        for author, count in sorted_counts[:10]:
             output += f"**{author.display_name}**: {count} messages\n"
 
         await ctx.send(output)
