@@ -20,9 +20,6 @@ class Images(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        self.quote_ctx_menu = app_commands.ContextMenu(name="Quote it", callback=self.quote)
-        self.bot.tree.add_command(self.quote_ctx_menu)
-
     @commands.command(brief="Resets ryderize if broken", hidden=True)
     async def re(self, ctx):
         global ryderize_running
@@ -36,22 +33,17 @@ class Images(commands.Cog):
         try:
             img = await image.read()
             with Image.open(io.BytesIO(img)) as i:
-                # Convert base image to RGBA
                 i = i.convert("RGBA")
 
-                # Open and convert ryder image to RGBA
                 ryder = Image.open(os.path.abspath('./data/ryder.png')).convert("RGBA")
 
-                # Scale ryder to match the height of the input image (accounting for custom scale)
                 scale_factor = i.height / ryder.height
                 new_width = int(round(ryder.width * scale_factor * scale))
-                new_height = int(round(ryder.height * scale_factor * scale))  # This scales proportionately
+                new_height = int(round(ryder.height * scale_factor * scale))
                 resized_ryder = ryder.resize((new_width, new_height))
 
-                # Position ryder on the right side
                 i.paste(resized_ryder, (i.width - new_width, 0), resized_ryder)
 
-                # Resize if too large (maintaining aspect ratio)
                 if i.height > 1080:
                     ratio = 1080 / i.height
                     new_width = int(i.width * ratio)
@@ -87,12 +79,6 @@ class Images(commands.Cog):
         except:
             await ctx.response.send_message(content=f"```{traceback.format_exc()}```")
 
-
-    @commands.command(hidden=True)
-    async def aaaa(self, ctx):
-        guild_id = 1226051359066030111  # your test guild ID
-        guild = discord.Object(id=guild_id)
-        self.bot.tree.add_command(self.quote_ctx_menu, guild=guild)
 
 
 async def setup(bot):
