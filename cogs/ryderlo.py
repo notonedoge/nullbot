@@ -54,7 +54,7 @@ class Ryderlo(commands.Cog):
 
     @commands.command()
     async def ryderboard(self, ctx):
-        embed = discord.Embed(title="Ryderlo Rankings", description="Top Ryder Mentioners", color=discord.Color.green())
+        embed = discord.Embed(title="Ryderlo Rankings", description="Top Ryder fhaufgi ayuef", color=discord.Color.green())
 
         # Calculate ratios and sort
         rankings = []
@@ -68,7 +68,7 @@ class Ryderlo(commands.Cog):
         rankings.sort(reverse=True)
 
         if not rankings:
-            embed.description = "No data yet!"
+            embed.description = "No data yet"
         else:
             for rank, (ratio, user_id, ryder_count, normal_count) in enumerate(rankings[:10], 1):  # Top 10
                 percentage = ratio * 100
