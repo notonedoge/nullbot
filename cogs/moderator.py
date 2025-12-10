@@ -92,7 +92,10 @@ class Moderator(commands.Cog):
 
 
 
-
+    @commands.command()
+    async def ban(self, ctx, member: discord.Member, reason: str):
+        await member.ban(reason=reason)
+        await ctx.reply(f'banned {member.name} for {reason}')
 
 async def setup(bot):
     await bot.add_cog(Moderator(bot))
