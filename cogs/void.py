@@ -88,68 +88,60 @@ class AI(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         try:
-            if message.author.bot:
+            if message.author.bot or not self.bot.user.mentioned_in(message):
                 return
-            if self.bot.user.mentioned_in(message):
-                await message.add_reaction('⏳')
-                grok = False
-                modified_msg = re.sub(rf'<@{self.bot.user.id}>' , ".", message.content).strip()
-                if "sonar" in modified_msg:
-                    modified_msg = re.sub(r'sonar', "", modified_msg).strip()
-                    grok = True
-                attachment_urls = []
 
+            await message.add_reaction('⏳')
 
-                if message.reference and message.reference.message_id:
-                    try:
-                        # Fetch the original message being replied to
-                        replied_message = await message.channel.fetch_message(message.reference.message_id)
-                        replied_content = replied_message.content or ""
+            # 1. Create a FRESH message list for this specific interaction
+            # (Or move the system prompt into the function)
+            local_messages = [{"role": "system", "content": prompt2}]
 
-                        # Construct the context message for the AI
-                        context_text = (
-                            f"The user is replying to a previous message by @{replied_message.author.name} "
-                            f"that said: \"{replied_content[:500]}{'...' if len(replied_content) > 500 else ''}\""
-                        )
+            # Clean the mention from the message
+            modified_msg = re.sub(rf'<@{self.bot.user.id}>', "", message.content).strip()
 
+            grok = False
+            if "sonar" in modified_msg.lower():
+                modified_msg = modified_msg.lower().replace("sonar", "").strip()
+                grok = True
 
-                        messages.append({
-                            "role": "user",
-                            "content": [{"type": "text", "text": context_text}]
-                        })
-                    except discord.NotFound:
-                        pass
-                    except discord.Forbidden:
-                        pass
+            # 2. Handle replying to context
+            if message.reference and message.reference.message_id:
+                try:
+                    replied_message = await message.channel.fetch_message(message.reference.message_id)
+                    context_text = f"Replying to @{replied_message.author.name}: \"{replied_message.content[:200]}...\""
+                    local_messages.append({"role": "user", "content": context_text})
+                except:
+                    pass
 
-                if message.attachments:
-                    user_prompt = [{"type": "text", "text": modified_msg}]
-                    for attachment in message.attachments:
+            # 3. Construct the user message properly (don't f-string the whole list)
+            user_text_content = f"{message.author.name}: {modified_msg}"
 
-                        if attachment.content_type and attachment.content_type.startswith('image'):
-                            attachment_urls.append(attachment.url)
-                            user_prompt.append({"type": "image_url", "image_url": {"url":attachment.url}})
-                else:
-                    user_prompt = [{"type": "text", "text": modified_msg}]
-                messages.append({"role": "user", "content": f"{message.author.name} ({message.author}): {user_prompt}"})
+            if message.attachments:
+                user_content = [{"type": "text", "text": user_text_content}]
+                for attachment in message.attachments:
+                    if attachment.content_type and attachment.content_type.startswith('image'):
+                        user_content.append({"type": "image_url", "image_url": {"url": attachment.url}})
+            else:
+                user_content = user_text_content
 
-                if grok:
-                    response = await client.chat.completions.create(model="sonar", messages=messages)
-                    citations = response.citations
-                else:
-                    response = await client.chat.completions.create(model="gpt-4o-mini", messages=messages)
-                    citations = None
+            local_messages.append({"role": "user", "content": user_content})
 
+            # 4. Make the API Call
+            if grok:
+                response = await client.chat.completions.create(model="sonar", messages=local_messages)
+                # Use getattr or model_extra to safely get citations
+                citations = getattr(response, "citations", [])
+            else:
+                response = await client.chat.completions.create(model="gpt-4o-mini", messages=local_messages)
+                citations = None
 
+            # 5. Handle UI and Reply
+            view = self.CitationsView(citations) if citations else None
+            await message.reply(f"{response.choices[0].message.content}", view=view)
 
-                view = None
-                if citations:
-                    # Only create the button view if citations exist
-                    view = self.CitationsView(citations)
-
-                await message.reply(f"{response.choices[0].message.content}", view=view)
-        except:
-            await message.reply(traceback.format_exc())
+        except Exception:
+            await message.reply(f"```py\n{traceback.format_exc()}\n```")
 
 
 async def setup(bot):
