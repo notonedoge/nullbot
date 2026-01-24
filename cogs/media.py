@@ -90,7 +90,7 @@ class Media(commands.Cog):
                 if link_type == "album":
                     text_content += "\nAlbum"
                 if playcount != 0:
-                    text_content += f"\n{playcount} plays"
+                    text_content += f"\n{playcount} global plays"
 
                 section = discord.ui.Section(
                     discord.ui.TextDisplay(text_content),
