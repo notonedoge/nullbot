@@ -77,10 +77,13 @@ class Media(commands.Cog):
                     data = lastfm_data.json()
                     if 'track' in data:
                         playcount = int(data['track']['playcount'])
+                        listeners = int(data['track']['listeners'])
                     else:
                         playcount = 0
+                        listeners = 0
                 else:
                     playcount = 0
+                    listeners = 0
 
 
                 view = discord.ui.LayoutView()
@@ -90,7 +93,7 @@ class Media(commands.Cog):
                 if link_type == "album":
                     text_content += "\nAlbum"
                 if playcount != 0:
-                    text_content += f"\n{playcount} global plays"
+                    text_content += f"\n{listeners} listeners | {playcount} plays"
 
                 section = discord.ui.Section(
                     discord.ui.TextDisplay(text_content),
