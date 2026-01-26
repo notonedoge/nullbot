@@ -17,12 +17,13 @@ bot = commands.Bot(
     command_prefix=',',
     intents=intents,
     application_id=1345951741144989766,
-    activity=discord.Game(name="Playing Half-Life 4"),
+    activity=discord.Game(name="Playing Half-Life 5"),
 )
 
 
 @bot.event
 async def on_ready():
+    print(Fore.LIGHTWHITE_EX + f'finished startup - now running')
     print(Fore.LIGHTWHITE_EX + f'logged in as {bot.user.name} - {bot.user.id} ({discord.__version__})')
     print(Fore.RESET)
     bot.startup_time = discord.utils.utcnow()
