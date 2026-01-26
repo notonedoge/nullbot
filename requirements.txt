@@ -6,3 +6,5 @@ PyYAML
 pillow
 python-dotenv
 twitchAPI
+feedparser
+openai
