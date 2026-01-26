@@ -47,7 +47,6 @@ class Media(commands.Cog):
                     song_cache[link] = song
                 info = song.json()
 
-
                 if not "entityUniqueId" in info: return
                 songid = info["entityUniqueId"]
                 title = info["entitiesByUniqueId"][songid]["title"]
@@ -57,7 +56,7 @@ class Media(commands.Cog):
 
                 if "youtube" in match.group(0) or "youtu.be" in match.group(0):
                     if 'spotify' not in info.get('linksByPlatform', {}):
-                        await message.clear_reactions()
+                        await message.clear_reaction("⏳")
                         return
 
                 lastfm_data = requests.get("http://ws.audioscrobbler.com/2.0/",
@@ -76,6 +75,7 @@ class Media(commands.Cog):
                 if lastfm_data.status_code == 200:
                     data = lastfm_data.json()
                     if 'track' in data:
+                        print(data)
                         playcount = int(data['track']['playcount'])
                         listeners = int(data['track']['listeners'])
                     else:
